@@ -1,4 +1,4 @@
-import os
+# app/__init__.py
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
 from .models import db
@@ -7,28 +7,32 @@ csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__)
-
-    # Secret key
+    
+    # =======================
+    # Basic Config
+    # =======================
     app.config['SECRET_KEY'] = 'dev-secret-key-12345'
-
-    # Secure session cookies
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///voting.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    # =======================
+    # Secure Session Cookies
+    # =======================
     app.config.update(
-        SESSION_COOKIE_SECURE=True,
-        SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SAMESITE='Lax'
+        SESSION_COOKIE_SECURE=True,      # Only over HTTPS
+        SESSION_COOKIE_HTTPONLY=True,    # Not accessible by JS
+        SESSION_COOKIE_SAMESITE='Lax'    # CSRF protection
     )
 
-    # Ensure instance folder exists
-    os.makedirs(app.instance_path, exist_ok=True)
-
-    # SQLite DB inside instance folder (absolute path)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, 'voting.db')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+    # =======================
+    # Initialize DB & CSRF
+    # =======================
     db.init_app(app)
     csrf.init_app(app)
 
-    # Security headers and CSP
+    # =======================
+    # Security Headers
+    # =======================
     @app.after_request
     def add_security_headers(response):
         # General security headers
@@ -36,9 +40,9 @@ def create_app():
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['X-XSS-Protection'] = '1; mode=block'
         response.headers['Referrer-Policy'] = 'no-referrer'
-        response.headers['Permissions-Policy'] = 'geolocation=(), camera=()'
+        response.headers['Permissions-Policy'] = 'geolocation=(), camera=(), microphone=()'
 
-        # Content Security Policy
+        # CSP - full coverage including fallbacks
         response.headers['Content-Security-Policy'] = (
             "default-src 'self'; "
             "script-src 'self'; "
@@ -48,7 +52,11 @@ def create_app():
             "connect-src 'self'; "
             "media-src 'self'; "
             "object-src 'none'; "
-            "frame-ancestors 'none';"
+            "frame-ancestors 'none'; "
+            "frame-src 'none'; "
+            "worker-src 'self'; "
+            "manifest-src 'self'; "
+            "base-uri 'self';"
         )
 
         # Cross-origin policies
@@ -61,9 +69,11 @@ def create_app():
 
         return response
 
-    # Import routes and create DB
+    # =======================
+    # Import Routes & Create DB
+    # =======================
     with app.app_context():
         from . import routes
-        db.create_all()  # Will now create voting.db in instance folder
+        db.create_all()
 
     return app
