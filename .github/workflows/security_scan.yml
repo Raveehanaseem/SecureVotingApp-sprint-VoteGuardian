@@ -1,4 +1,8 @@
-name: Security Scans
+name: Security Scan
+
+permissions:
+  contents: read
+  security-events: write   # Required for CodeQL results
 
 on:
   push:
@@ -7,6 +11,9 @@ on:
     branches: [ phase4/Security-testing ]
 
 jobs:
+  # -----------------------------
+  # 1️⃣ SAST: CodeQL Analysis
+  # -----------------------------
   codeql-analysis:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
@@ -22,34 +29,33 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
 
+  # -----------------------------
+  # 2️⃣ DAST: OWASP ZAP Scan
+  # -----------------------------
   dast-scan:
-    name: OWASP ZAP DAST Scan
+    name: OWASP ZAP DAST Scan (Non-Docker)
     runs-on: ubuntu-latest
+    needs: codeql-analysis  # Optional: run after SAST
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install dependencies & start Flask
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
           pip install -r online-voting-app/requirements.txt
-
-      - name: Start Flask App
-        run: |
-          source venv/bin/activate
-          nohup flask --app online-voting-app/app.py run --host=0.0.0.0 --port=5000 & 
+          nohup flask --app online-voting-app/app run --host=0.0.0.0 --port=5000 &
           sleep 15
 
       - name: Run OWASP ZAP Full Scan
         uses: zaproxy/action-full-scan@v0.7.0
         with:
           target: 'http://127.0.0.1:5000'
-          docker_args: '--network host'
           fail_action: true
