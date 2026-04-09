@@ -1,0 +1,32 @@
+name: DevSecOps Security Scan
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  security_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Bandit SAST Scan
+        run: |
+          # -r . (Recursive scan)
+          # -v (Verbose output)
+          # -ll (Only report Medium and High severity issues to avoid minor build failures)
+          bandit -r . -v -ll
