@@ -2,9 +2,9 @@ name: DevSecOps Security Scan
 
 on:
   push:
-    branches: [ "main", "phase-3-implementation", "phase-4-testing" ]
+    branches: ["**"]  
   pull_request:
-    branches: [ "main" ]
+    branches: ["**"]
 
 jobs:
   security_scan:
@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/checkout@v3
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
@@ -22,9 +22,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install bandit
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
+          
       - name: Run Bandit SAST Scan
         run: |
-          # Bandit code scan karega aur ghaltiyan dhoonday ga
           bandit -r . -v
