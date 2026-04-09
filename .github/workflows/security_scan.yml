@@ -23,15 +23,20 @@ jobs:
         uses: github/codeql-action/analyze@v4
 
   dast-scan:
-    name: OWASP ZAP DAST Scan (Non-Docker)
+    name: OWASP ZAP DAST Scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
         run: |
-          python3 -m venv venv
+          python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
           pip install -r online-voting-app/requirements.txt
@@ -39,7 +44,7 @@ jobs:
       - name: Start Flask App
         run: |
           source venv/bin/activate
-          nohup flask --app online-voting-app/app.py run --host=0.0.0.0 --port=5000 &
+          nohup flask --app online-voting-app/app.py run --host=0.0.0.0 --port=5000 & 
           sleep 15
 
       - name: Run OWASP ZAP Full Scan
