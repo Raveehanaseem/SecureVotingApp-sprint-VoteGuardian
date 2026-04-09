@@ -1,0 +1,13 @@
+{
+  "ignore": [],
+  "enforce": [
+    {
+      "url": "http://127.0.0.1:5000",
+      "alert": "Cross Site Scripting (XSS)"
+    },
+    {
+      "url": "http://127.0.0.1:5000",
+      "alert": "SQL Injection"
+    }
+  ]
+}
