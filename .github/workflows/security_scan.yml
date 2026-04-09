@@ -1,5 +1,6 @@
 name: Security Scan
 
+# Trigger on pushes and PRs to phase4 branch
 on:
   push:
     branches: [ phase4/Security-testing ]
@@ -7,38 +8,46 @@ on:
     branches: [ phase4/Security-testing ]
 
 jobs:
+  # --- CodeQL Analysis (SAST) ---
   codeql-analysis:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v2
         with:
           languages: python
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v2
 
+  # --- OWASP ZAP DAST Scan ---
   dast-scan:
     name: OWASP ZAP DAST Scan
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Start Flask App
+      - name: Set up Python
         run: |
           python3 -m venv venv
           source venv/bin/activate
+          pip install --upgrade pip
           pip install -r online-voting-app/requirements.txt
-          nohup flask --app online-voting-app/app.py run --host=0.0.0.0 --port=5000 &
-          sleep 10
+
+      - name: Start Flask App
+        run: |
+          source venv/bin/activate
+          export FLASK_APP=online-voting-app/app.py
+          nohup flask run --host=0.0.0.0 --port=5000 &
+          sleep 15
 
       - name: Run OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.7.0
         with:
           target: 'http://127.0.0.1:5000'
-          rules_file_name: ''
+          fail_on_alert: 'High'
