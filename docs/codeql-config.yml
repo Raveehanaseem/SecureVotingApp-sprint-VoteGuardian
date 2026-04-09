@@ -1,0 +1,3 @@
+name: "Python Security Queries"
+queries:
+  - security-and-quality/python   # default Python security queries
