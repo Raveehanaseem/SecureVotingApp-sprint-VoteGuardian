@@ -1,16 +1,14 @@
 name: Security Scan
+
+permissions:
+  contents: read
+  security-events: write
+
 on:
   push:
     branches: [ phase4/Security-testing ]
   pull_request:
     branches: [ phase4/Security-testing ]
-
-permissions:
-  security-events: read
-  contents: read
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   codeql-analysis:
@@ -35,20 +33,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      - name: Install requirements
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r online-voting-app/requirements.txt
-
       - name: Start Flask App
         run: |
+          python3 -m venv venv
           source venv/bin/activate
+          pip install -r online-voting-app/requirements.txt
           nohup flask --app online-voting-app/app.py run --host=0.0.0.0 --port=5000 &
           sleep 15
 
@@ -56,4 +45,4 @@ jobs:
         uses: zaproxy/action-baseline@v0.8.0
         with:
           target: 'http://127.0.0.1:5000'
-          fail_on_error: true
+          fail_action: true
