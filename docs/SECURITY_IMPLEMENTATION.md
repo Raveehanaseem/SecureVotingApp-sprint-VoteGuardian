@@ -1,4 +1,4 @@
-# 🗳️ Secure CR Election System (Phase 3)
+# Secure CR Election System (Phase 3)
 **Team Name:** VoteGuardian  
 **Lead:** Raveeha Naseem  
 **Focus:** Secure Implementation & DevSecOps Integration
