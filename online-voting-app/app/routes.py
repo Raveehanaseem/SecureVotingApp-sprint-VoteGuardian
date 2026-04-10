@@ -7,6 +7,7 @@ import logging
 # ----------------------------
 # Logging Configuration
 # ----------------------------
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -26,7 +27,6 @@ def index():
     if "user_id" not in session:
         session["user_id"] = str(uuid.uuid4())[:8]
     return render_template("vote.html")
-
 
 @app.route("/cast_vote", methods=["POST"])
 def cast_vote():
@@ -50,7 +50,6 @@ def cast_vote():
 
     return redirect(url_for('get_ballot', ballot_id=new_vote.id))
 
-
 @app.route("/ballot/<int:ballot_id>")
 def get_ballot(ballot_id):
     user_id = session.get("user_id")
@@ -61,3 +60,4 @@ def get_ballot(ballot_id):
         abort(403)  # Forbidden
 
     return render_template("thank_you.html", ballot=ballot)
+

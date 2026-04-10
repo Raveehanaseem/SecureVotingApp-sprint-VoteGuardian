@@ -1,115 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Secure Class Election 2026 | Vote for CR</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { 
-            background-color: #008080; /* Teal Background */
-            color: #ffffff; /* White Text */
-            font-family: 'Inter', 'Segoe UI', sans-serif; 
-            min-height: 100vh;
-        }
-        .nav-header { 
-            background: #006666; padding: 35px; 
-            border-bottom: 4px solid #FFD700; /* Bold Yellow Line */
-        }
-        .candidate-card { 
-            border: 2px solid rgba(255, 215, 0, 0.3); 
-            border-radius: 20px; transition: 0.4s; cursor: pointer;
-            background: rgba(0, 102, 102, 0.6); padding: 30px; height: 100%;
-        }
-        .candidate-card:hover { 
-            transform: translateY(-10px); border-color: #FFD700;
-            background: #006666;
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
-        }
-        .btn-check:checked + .candidate-card { 
-            background: #004d4d; border-color: #FFD700; 
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4); 
-        }
-        .symbol-circle {
-            width: 70px; height: 70px; background: #FFD700; color: #004d4d;
-            border-radius: 50%; display: flex; align-items: center; 
-            justify-content: center; margin: 0 auto 15px; font-weight: 900; font-size: 1.5rem;
-        }
-        .submit-area { 
-            background: #006666; border-top: 3px solid #FFD700; 
-            padding: 40px; margin-top: 60px; 
-        }
-        .vote-btn { 
-            background: #FFD700; color: #000; border: none; padding: 20px 80px; 
-            font-weight: 800; border-radius: 50px; font-size: 1.3rem; transition: 0.3s;
-        }
-        .vote-btn:hover { transform: scale(1.05); background: #ffffff; color: #008080; }
-        
-        .slogan { color: #FFD700 !important; font-weight: 600; font-style: italic; }
-        .candidate-name { font-size: 1.4rem; font-weight: 700; margin-top: 10px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Voting Portal | Class Election 2026</title>
+
+  <!--
+    FIX [90003] Sub Resource Integrity Attribute Missing:
+    Added integrity (SRI hash) and crossorigin="anonymous" to Bootstrap CDN link.
+    This ensures the browser verifies the file has not been tampered with.
+  -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+    crossorigin="anonymous">
+
+  <!--
+    FIX [10055] CSP: style-src unsafe-inline:
+    The <style> tag now uses the per-request nonce injected by Flask (g.csp_nonce).
+    The CSP header in __init__.py allows only nonce-matched inline styles,
+    so 'unsafe-inline' is no longer needed or present in the CSP.
+  -->
+  <style nonce="{{ g.csp_nonce }}">
+    .nav-header {
+      background: #006666;
+      padding: 20px 40px;
+      border-bottom: 4px solid #FFD700;
+    }
+
+    .candidate-card {
+      border: 2px solid rgba(255, 215, 0, 0.3);
+      border-radius: 20px;
+      transition: 0.4s;
+      cursor: pointer;
+      background: rgba(0, 102, 102, 0.6);
+      padding: 30px;
+      height: 100%;
+    }
+
+    .candidate-card:hover {
+      transform: translateY(-10px);
+      border-color: #FFD700;
+      background: #006666;
+      box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+    }
+
+    .btn-check:checked + .candidate-card {
+      background: #004d4d;
+      border-color: #FFD700;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+    }
+
+    .symbol-circle {
+      width: 70px;
+      height: 70px;
+      background: #FFD700;
+      color: #004d4d;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      font-weight: 900;
+      font-size: 1.5rem;
+    }
+
+    .submit-area {
+      background: #006666;
+      border-top: 3px solid #FFD700;
+      padding: 40px;
+      margin-top: 60px;
+    }
+
+    .vote-btn {
+      background: #FFD700;
+      color: #000;
+      border: none;
+      padding: 20px 80px;
+      font-weight: 800;
+      border-radius: 50px;
+      font-size: 1.3rem;
+      transition: 0.3s;
+    }
+
+    .vote-btn:hover { transform: scale(1.05); background: #ffffff; color: #008080; }
+    .slogan { color: #FFD700 !important; font-weight: 600; font-style: italic; }
+    .candidate-name { font-size: 1.4rem; font-weight: 700; margin-top: 10px; }
+
+    body {
+      background-color: #008080;
+      color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="nav-header text-center">
-        <h1 class="fw-bold mb-1">SECURE ONLINE VOTING APP</h1>
-        <p class="slogan mb-0">Select your Representative: Shaping the Future of Our Class Together!</p>
-    </div>
+  <div class="nav-header text-center">
+    <h1 class="fw-bold mb-1">SECURE ONLINE VOTING APP</h1>
+    <p class="slogan mb-0">Select your Representative: Shaping the Future of Our Class Together!</p>
+  </div>
 
-    <div class="container mt-5">
-        <form method="POST" action="/cast_vote">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> 
-            
-            <h4 class="text-center text-white-50 mb-5">VOTING PORTAL: CR ELECTION 2026</h4>
-            
-            <div class="row g-4 mb-4 text-center">
-                <div class="col-md-4">
-                    <input type="radio" class="btn-check" name="candidate" id="c1" value="Ali" required>
-                    <label class="card candidate-card" for="c1">
-                        <div class="symbol-circle">A</div>
-                        <div class="candidate-name">Ali</div>
-                        <p class="small opacity-75">Visionary Leadership</p>
-                    </label>
-                </div>
-                <div class="col-md-4">
-                    <input type="radio" class="btn-check" name="candidate" id="c2" value="Zahid">
-                    <label class="card candidate-card" for="c2">
-                        <div class="symbol-circle">Z</div>
-                        <div class="candidate-name">Zahid</div>
-                        <p class="small opacity-75">Voice of Reason</p>
-                    </label>
-                </div>
-                <div class="col-md-4">
-                    <input type="radio" class="btn-check" name="candidate" id="c3" value="Maryam">
-                    <label class="card candidate-card" for="c3">
-                        <div class="symbol-circle">M</div>
-                        <div class="candidate-name">Maryam</div>
-                        <p class="small opacity-75">Integrity & Excellence</p>
-                    </label>
-                </div>
-            </div>
+  <div class="container mt-5">
+    <form method="POST" action="/cast_vote">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-            <div class="row g-4 justify-content-center text-center">
-                <div class="col-md-4">
-                    <input type="radio" class="btn-check" name="candidate" id="c4" value="Rida">
-                    <label class="card candidate-card" for="c4">
-                        <div class="symbol-circle">R</div>
-                        <div class="candidate-name">Rida</div>
-                        <p class="small opacity-75">Unity & Support</p>
-                    </label>
-                </div>
-                <div class="col-md-4">
-                    <input type="radio" class="btn-check" name="candidate" id="c5" value="Hamza">
-                    <label class="card candidate-card" for="c5">
-                        <div class="symbol-circle">H</div>
-                        <div class="candidate-name">Hamza</div>
-                        <p class="small opacity-75">Innovation & Action</p>
-                    </label>
-                </div>
-            </div>
+      <h4 class="text-center text-white-50 mb-5">VOTING PORTAL: CR ELECTION 2026</h4>
 
-            <div class="submit-area text-center rounded-top">
-                <button type="submit" class="btn vote-btn shadow-lg">CAST YOUR VOTE</button>
-            </div>
-        </form>
-    </div>
+      <div class="row g-4 mb-4 text-center">
+        <div class="col-md-4">
+          <input type="radio" class="btn-check" name="candidate" id="c1" value="Ali" required>
+          <label class="card candidate-card" for="c1">
+            <div class="symbol-circle">A</div>
+            <div class="candidate-name">Ali</div>
+            <p class="small opacity-75">Visionary Leadership</p>
+          </label>
+        </div>
+
+        <div class="col-md-4">
+          <input type="radio" class="btn-check" name="candidate" id="c2" value="Zahid">
+          <label class="card candidate-card" for="c2">
+            <div class="symbol-circle">Z</div>
+            <div class="candidate-name">Zahid</div>
+            <p class="small opacity-75">Voice of Reason</p>
+          </label>
+        </div>
+
+        <div class="col-md-4">
+          <input type="radio" class="btn-check" name="candidate" id="c3" value="Maryam">
+          <label class="card candidate-card" for="c3">
+            <div class="symbol-circle">M</div>
+            <div class="candidate-name">Maryam</div>
+            <p class="small opacity-75">Integrity &amp; Excellence</p>
+          </label>
+        </div>
+      </div>
+
+      <div class="row g-4 justify-content-center text-center">
+        <div class="col-md-4">
+          <input type="radio" class="btn-check" name="candidate" id="c4" value="Rida">
+          <label class="card candidate-card" for="c4">
+            <div class="symbol-circle">R</div>
+            <div class="candidate-name">Rida</div>
+            <p class="small opacity-75">Unity &amp; Support</p>
+          </label>
+        </div>
+
+        <div class="col-md-4">
+          <input type="radio" class="btn-check" name="candidate" id="c5" value="Hamza">
+          <label class="card candidate-card" for="c5">
+            <div class="symbol-circle">H</div>
+            <div class="candidate-name">Hamza</div>
+            <p class="small opacity-75">Innovation &amp; Action</p>
+          </label>
+        </div>
+      </div>
+
+      <div class="submit-area text-center rounded-top">
+        <button type="submit" class="btn vote-btn shadow-lg">CAST YOUR VOTE</button>
+      </div>
+    </form>
+  </div>
 </body>
 </html>
